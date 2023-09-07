@@ -1,6 +1,6 @@
 resource "azurerm_resource_group" "tfeazytraining-gp" {
   name     = "my-eazytraining-rg"
-  location = "West Europe"
+  location = "France central"
 }
 
 # Create a Virtual Network
@@ -23,11 +23,18 @@ resource "azurerm_subnet" "tfeazytraining-subnet" {
   address_prefixes     = ["10.0.2.0/24"]
 }
 
+# Create public IPs
+resource "azurerm_public_ip" "tfeazytraining-pubip" {
+  name                = "my-eazytraining-pubip"
+  location            = azurerm_resource_group.tfeazytraining-gp.location
+  resource_group_name = azurerm_resource_group.tfeazytraining-gp.name
+  allocation_method   = "Dynamic"
+}
 
 # Create a Network Security Group and rule
 resource "azurerm_network_security_group" "tfeazytraining-nsg" {
   name                = "my-eazytraining-nsg"
-  location            = azurerm_resource_group.tfeazytraining.location
+  location            = azurerm_resource_group.tfeazytraining-gp.location
   resource_group_name = azurerm_resource_group.tfeazytraining-gp.name
 
   tags = {
@@ -45,7 +52,7 @@ resource "azurerm_network_interface" "tfeazytraining-vnic" {
     name                          = "my-eazytraining-nic-ip"
     subnet_id                     = azurerm_subnet.tfeazytraining-subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.tfeazytraining.id
+    public_ip_address_id          = azurerm_public_ip.tfeazytraining-pubip.id
   }
 
   tags = {
@@ -56,7 +63,7 @@ resource "azurerm_network_interface" "tfeazytraining-vnic" {
 # Create a Network Interface Security Group association
 resource "azurerm_network_interface_security_group_association" "tfeazytraining-assoc" {
   network_interface_id      = azurerm_network_interface.tfeazytraining-vnic.id
-  network_security_group_id = azurerm_network_security_group.tfeazytraining-sg.id
+  network_security_group_id = azurerm_network_security_group.tfeazytraining-nsg.id
 }
 
 # Create a Virtual Machine
@@ -65,7 +72,7 @@ resource "azurerm_linux_virtual_machine" "tfeazytraining-vm" {
   location                        = azurerm_resource_group.tfeazytraining-gp.location
   resource_group_name             = azurerm_resource_group.tfeazytraining-gp.name
   network_interface_ids           = [azurerm_network_interface.tfeazytraining-vnic.id]
-  size                            = ""
+  size                            = "Standard_DS1_v2"
   computer_name                   = "myvm"
   admin_username                  = "azureuser"
   admin_password                  = "Password1234!"
@@ -89,4 +96,3 @@ resource "azurerm_linux_virtual_machine" "tfeazytraining-vm" {
     environment = "my-eazytraining-env"
   }
 }
-
