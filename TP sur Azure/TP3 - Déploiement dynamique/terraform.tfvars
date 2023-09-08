@@ -1,1 +1,1 @@
-instance_template="Standard_DS1_v2"
+instance_type="Standard_D1_v2"
