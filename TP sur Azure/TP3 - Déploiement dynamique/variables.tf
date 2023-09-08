@@ -1,17 +1,16 @@
-variable "web_server_port" {
-  type = number
-  description = "The port the server will use for HTTP requests"
-  default     = "80"
+variable "instance_type" {
+   description = "size of the vm"
+   default = "Standard_D2_v2"
 }
 
-variable "ssh_server_port" {
-  type = number
-  description = "The port the server will use for ssh requests"
-  default     = "22"
+variable "location" {
+    description = "location of the vm"
+    default = "france central"
 }
 
-variable "instance_template" {
-  type = string
-  description = "Template for the webserver"
-  default     = "Standard_D2_v2"
+variable "resource_group_name" {
+    description = "name of the resource group"
+    default = "tfeazytraining-gp"
+  
 }
+
