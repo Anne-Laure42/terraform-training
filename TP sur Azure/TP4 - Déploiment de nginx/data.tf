@@ -7,6 +7,5 @@ data "azurerm_platform_image" "eazytraining-image" {
 
 data "azurerm_public_ip" "tfeazytraining-pubip" {
   name                = azurerm_public_ip.tfeazytraining-pubip.name
-  resource_group_name = azurerm_linux_virtual_machine.tfeazytraining-nginxserver.name
+  resource_group_name = azurerm_resource_group.tfeazytraining-gp.name
 }
-
