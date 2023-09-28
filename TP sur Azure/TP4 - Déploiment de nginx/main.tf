@@ -1,6 +1,16 @@
+# Create a ramdom string for the Storage Account
+resource "random_string" "storage_account" {
+  length = 8
+  upper = false
+  number = true
+  lower = true
+  special = false
+}
+
+# Create a Resource Group
 resource "azurerm_resource_group" "tfeazytraining-gp" {
-  name     = "my-eazytraining-rg"
-  location = "West Europe"
+  name     = var.resource_group_name
+  location = var.location
 }
 
 # Create a Virtual Network
@@ -11,7 +21,7 @@ resource "azurerm_virtual_network" "tfeazytraining-vnet" {
   address_space       = ["10.0.0.0/16"]
 
   tags = {
-    environment = "my-eazytraining-env"
+    environment = "nginx-server"
   }
 }
 
@@ -23,49 +33,47 @@ resource "azurerm_subnet" "tfeazytraining-subnet" {
   address_prefixes     = ["10.0.2.0/24"]
 }
 
-# Create a Public IP
-resource "azurerm_public_ip" "tfeazytraining-ip" {
-  name                = "my-eazytraining-public-ip"
+# Create public IPs
+resource "azurerm_public_ip" "tfeazytraining-pubip" {
+  name                = "my-eazytraining-pubip"
   location            = azurerm_resource_group.tfeazytraining-gp.location
   resource_group_name = azurerm_resource_group.tfeazytraining-gp.name
-  allocation_method   = "Static"
-
-  tags = {
-    environment = "my-eazytraining-env"
-  }
+  allocation_method   = "Dynamic"
 }
 
 # Create a Network Security Group and rule
 resource "azurerm_network_security_group" "tfeazytraining-nsg" {
   name                = "my-eazytraining-nsg"
-  location            = azurerm_resource_group.tfeazytraining.location
+  location            = azurerm_resource_group.tfeazytraining-gp.location
   resource_group_name = azurerm_resource_group.tfeazytraining-gp.name
-
-  security_rule {
-    name                       = "HTTP"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = var.web_server_port
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+ 
+ 
+    security_rule {
+       name = "http"
+       priority = 100
+       direction = "Inbound"
+       access = "Allow"
+       protocol = "Tcp"
+       source_port_range = "*"
+       destination_port_range = "80"
+       source_address_prefix = "*"
+       destination_address_prefix = "*"
+   }
 
     security_rule {
-    name                       = "HTTP"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = var.ssh_server_port
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+       name = "ssh"
+       priority = 300
+       direction = "Inbound"
+       access = "Allow"
+       protocol = "Tcp"
+       source_port_range = "*"
+       destination_port_range = "22"
+       source_address_prefix = "*"
+       destination_address_prefix = "*"
+   }
+
   tags = {
-    environment = "my-eazytraining-env"
+    environment = "nginx-server"
   }
 }
 
@@ -79,37 +87,48 @@ resource "azurerm_network_interface" "tfeazytraining-vnic" {
     name                          = "my-eazytraining-nic-ip"
     subnet_id                     = azurerm_subnet.tfeazytraining-subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.tfeazytraining.id
+    public_ip_address_id          = azurerm_public_ip.tfeazytraining-pubip.id
   }
 
   tags = {
-    environment = "my-eazytraining-env"
+    environment = "nginx-server"
   }
 }
 
 # Create a Network Interface Security Group association
 resource "azurerm_network_interface_security_group_association" "tfeazytraining-assoc" {
   network_interface_id      = azurerm_network_interface.tfeazytraining-vnic.id
-  network_security_group_id = azurerm_network_security_group.tfeazytraining-sg.id
+  network_security_group_id = azurerm_network_security_group.tfeazytraining-nsg.id
+}
+
+# Generate SSH key
+resource "tls_private_key" "ssh" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 # Create a Virtual Machine
-resource "azurerm_linux_virtual_machine" "tfeazytraining-vm" {
-  name                            = "my-eazytraining-vm"
+resource "azurerm_linux_virtual_machine" "tfeazytraining-nginxserver" {
+  name                            = "my-eazytraining-nginxserver"
   location                        = azurerm_resource_group.tfeazytraining-gp.location
   resource_group_name             = azurerm_resource_group.tfeazytraining-gp.name
   network_interface_ids           = [azurerm_network_interface.tfeazytraining-vnic.id]
-  size                            = var.instance_template
+  size                            = var.instance_type
   computer_name                   = "myvm"
   admin_username                  = "azureuser"
-  admin_password                  = "Password1234!"
-  disable_password_authentication = false
+  admin_password                  = var.vm_password
+  disable_password_authentication = true
 
-    source_image_reference {
+  admin_ssh_key {
+   username = "azureuser"
+   public_key = file("~/.ssh/id_rsa.pub")
+  }
+
+  source_image_reference {
     publisher = data.azurerm_platform_image.eazytraining-image.publisher
     offer     = data.azurerm_platform_image.eazytraining-image.offer
     sku       = data.azurerm_platform_image.eazytraining-image.sku
-    version   = data.azurerm_platform_image.eazytraining-image.version
+    version   = "latest"
   }
   
   os_disk {
@@ -117,44 +136,46 @@ resource "azurerm_linux_virtual_machine" "tfeazytraining-vm" {
     storage_account_type = "Standard_LRS"
     caching              = "ReadWrite"
   }
-   provisioner "local-exec" {
-     command = "echo ${azurerm_linux_virtual_machine.tfeazytraining-vm.name}:  ${azurerm_public_ip.tfeazytraining-ip.ip_address} >> ip_address.txt"
-	}
 	
   tags = {
-    environment = "my-eazytraining-env"
+    environment = "nginx-server"
   }
+
+  connection {
+        host = azurerm_linux_virtual_machine.tfeazytraining-nginxserver.public_ip_address
+        user = "azureuser"
+        password = var.vm_password
+        type = "ssh"
+        private_key = "${file("~/.ssh/id_rsa")}"
+        timeout = "1m"
+    }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt update",
+      "sudo apt install nginx -y",
+      "sudo systemctl enable nginx",
+      "sudo systemctl start nginx"
+    ]
+  }
+
+ provisioner "local-exec" {
+    command = "echo ${azurerm_linux_virtual_machine.tfeazytraining-nginxserver.private_key.private_ip_address} >> ip_address.txt"
+  } 
 }
 
-resource "azurerm_storage_account" "eazytraining-sa" {
-  name                     = "storage-account-azure-votreprenom-eazytraining"
-  resource_group_name      = azurerm_resource_group.eazytraining.name
-  location                 = azurerm_resource_group.eazytraining.location
+# Create a Storage account
+resource "azurerm_storage_account" "storage-account-azure-anne-eazytraining" {
+  name                     = "storage${random_string.storage_account.result}"
+  location                 = azurerm_resource_group.tfeazytraining-gp.location
+  resource_group_name      = azurerm_resource_group.tfeazytraining-gp.name
   account_tier             = "Standard"
   account_replication_type = "LRS"
-
-}
-
-resource "azurerm_storage_container" "eazytraining-container" {
-  name                  = "eazytraining-container"
-  storage_account_name  = azurerm_storage_account.eazytraining-sa.name
-  container_access_type = "private"
-}
-
-resource "azurerm_virtual_machine_extension" "vm-extension" {
-  name                 = "hostname"
-  virtual_machine_id   = azurerm_linux_virtual_machine.tfeazytraining-vm.id
-  publisher            = "Microsoft.Azure.Extensions"
-  type                 = "CustomScript"
-  type_handler_version = "2.1"
-
-  settings = <<SETTINGS
-    {
-      "commandToExecute": "sudo apt-get install -y nginx ; sudo systemctl enable --now nginx"
-    }
-  SETTINGS
-
-  tags = {
-    environment = "my-terraform-env"
   }
-}
+
+# Create a Blob container
+resource "azurerm_storage_container" "eazytraining-container" {
+  name                  = "my-blob-container"
+  storage_account_name  = azurerm_storage_account.storage-account-azure-anne-eazytraining.name
+  container_access_type = "private"
+  }
