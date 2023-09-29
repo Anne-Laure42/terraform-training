@@ -1,4 +1,4 @@
-TP4 - Déploiment de nginx
+TP4 - Déploiment d'un container nginx dans la VM
 
 A partir du code du tp-4, vous allez le modifier pour installer docker et créer un container tournant avec Nginx.
 
