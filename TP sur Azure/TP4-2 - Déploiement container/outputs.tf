@@ -1,5 +1,5 @@
 output "public_ip" {
-  value = data.azurerm_public_ip.tfeazytraining-pubip.ip_address
+  value = "${azurerm_linux_virtual_machine.tfeazytraining-nginxserver.name}: ${data.azurerm_public_ip.tfeazytraining-pubip.ip_address}"
 }
 
 output "private_key" {
