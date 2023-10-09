@@ -167,7 +167,7 @@ resource "azurerm_linux_virtual_machine" "tfeazytraining-nginxserver" {
   }
 
   provisioner "local-exec" {
-    command = "echo ${azurerm_linux_virtual_machine.tfeazytraining-nginxserver.public_ip_address} >> ip_address.txt"
+    command = "echo ${azurerm_linux_virtual_machine.tfeazytraining-nginxserver.public_ip_address} >> public_ip_address.txt"
   } 
 }
 
