@@ -1,8 +1,7 @@
 #!/bin/bash
 
 #Installing Docker
-sudo apt update &&
-sudo apt upgrade -y &&
+sudo apt update -y &&
 sudo apt install -y curl ca-certificates lsb-release gnupg &&
 sudo curl -fssl https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - &&
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" &&
