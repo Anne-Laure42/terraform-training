@@ -5,7 +5,7 @@ data "azurerm_platform_image" "eazytraining-image" {
   sku       = "20_04-lts"
 }
 
-data "azurerm_public_ip" "tfeazytraining-pubip" {
+data "azurerm_public_ip" "tfeazytraining-pubip-data" {
   name                = azurerm_public_ip.tfeazytraining-pubip.name
   resource_group_name = azurerm_resource_group.tfeazytraining-gp.name
 }
