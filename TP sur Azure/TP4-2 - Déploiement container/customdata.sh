@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 
 #Installing Docker
 sudo apt update &&
