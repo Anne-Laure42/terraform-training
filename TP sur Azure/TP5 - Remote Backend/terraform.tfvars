@@ -1,1 +1,3 @@
-instance_template="Standard_DS1_v2"
+TF_VAR_admin_username = "azureuser"
+
+TF_VAR_admin_password = "Password1234!"
