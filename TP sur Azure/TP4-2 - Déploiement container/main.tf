@@ -175,8 +175,8 @@ resource "azurerm_storage_account" "storage-account-azure-anne-eazytraining" {
   }
 
 # Create a Blob container
-resource "azurerm_storage_container" "eazytraining-container" {
-  name                  = "my-blob-container"
-  storage_account_name  = azurerm_storage_account.storage-account-azure-anne-eazytraining.name
-  container_access_type = "private"
-  }
+#resource "azurerm_storage_container" "tfstate" {
+#  name                  = "my-blob-tfstate"
+#  storage_account_name  = azurerm_storage_account.storage-account-azure-anne-eazytraining.name
+#  container_access_type = "private"
+# }
