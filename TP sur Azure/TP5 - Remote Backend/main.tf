@@ -118,8 +118,6 @@ resource "azurerm_linux_virtual_machine" "tfeazytraining-nginxserver" {
   admin_password                  = var.TF_VAR_admin_password
   disable_password_authentication = true
 
-  custom_data = filebase64("customdata.sh")
-
   admin_ssh_key {
    username = "azureuser"
    public_key = file("~/.ssh/id_rsa.pub")
