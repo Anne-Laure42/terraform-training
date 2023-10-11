@@ -69,12 +69,6 @@ resource "azurerm_network_security_group" "tfeazytraining-nsg" {
   }
 }
 
-# Create a Network Interface Security Group association
-resource "azurerm_network_interface_security_group_association" "tfeazytraining-assoc" {
-  network_interface_id      = azurerm_network_interface.tfeazytraining-vnic.id
-  network_security_group_id = azurerm_network_security_group.tfeazytraining-nsg.id
-}
-
 # Create public IPs
 resource "azurerm_public_ip" "tfeazytraining-pubip" {
   name                = "my-eazytraining-pubip"
