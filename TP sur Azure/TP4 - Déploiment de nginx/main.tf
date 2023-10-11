@@ -33,14 +33,6 @@ resource "azurerm_subnet" "tfeazytraining-subnet" {
   address_prefixes     = ["10.0.2.0/24"]
 }
 
-# Create public IPs
-resource "azurerm_public_ip" "tfeazytraining-pubip" {
-  name                = "my-eazytraining-pubip"
-  location            = azurerm_resource_group.tfeazytraining-gp.location
-  resource_group_name = azurerm_resource_group.tfeazytraining-gp.name
-  allocation_method   = "Dynamic"
-}
-
 # Create a Network Security Group and rule
 resource "azurerm_network_security_group" "tfeazytraining-nsg" {
   name                = "my-eazytraining-nsg"
@@ -77,6 +69,20 @@ resource "azurerm_network_security_group" "tfeazytraining-nsg" {
   }
 }
 
+# Create a Network Interface Security Group association
+resource "azurerm_network_interface_security_group_association" "tfeazytraining-assoc" {
+  network_interface_id      = azurerm_network_interface.tfeazytraining-vnic.id
+  network_security_group_id = azurerm_network_security_group.tfeazytraining-nsg.id
+}
+
+# Create public IPs
+resource "azurerm_public_ip" "tfeazytraining-pubip" {
+  name                = "my-eazytraining-pubip"
+  location            = azurerm_resource_group.tfeazytraining-gp.location
+  resource_group_name = azurerm_resource_group.tfeazytraining-gp.name
+  allocation_method   = "Dynamic"
+}
+
 # Create a Network Interface
 resource "azurerm_network_interface" "tfeazytraining-vnic" {
   name                = "my-eazytraining-nic"
@@ -89,16 +95,9 @@ resource "azurerm_network_interface" "tfeazytraining-vnic" {
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.tfeazytraining-pubip.id
   }
-
   tags = {
     environment = "nginx-server"
   }
-}
-
-# Create a Network Interface Security Group association
-resource "azurerm_network_interface_security_group_association" "tfeazytraining-assoc" {
-  network_interface_id      = azurerm_network_interface.tfeazytraining-vnic.id
-  network_security_group_id = azurerm_network_security_group.tfeazytraining-nsg.id
 }
 
 # Generate SSH key
@@ -118,6 +117,8 @@ resource "azurerm_linux_virtual_machine" "tfeazytraining-nginxserver" {
   admin_username                  = "azureuser"
   admin_password                  = var.vm_password
   disable_password_authentication = true
+
+  custom_data = filebase64("customdata.sh")
 
   admin_ssh_key {
    username = "azureuser"
@@ -159,8 +160,8 @@ resource "azurerm_linux_virtual_machine" "tfeazytraining-nginxserver" {
     ]
   }
 
- provisioner "local-exec" {
-    command = "echo ${azurerm_linux_virtual_machine.tfeazytraining-nginxserver.public_ip_address} >> ip_address.txt"
+  provisioner "local-exec" {
+    command = "echo ${azurerm_linux_virtual_machine.tfeazytraining-nginxserver.public_ip_address} >> public_ip_address.txt"
   } 
 }
 
@@ -174,8 +175,8 @@ resource "azurerm_storage_account" "storage-account-azure-anne-eazytraining" {
   }
 
 # Create a Blob container
-resource "azurerm_storage_container" "eazytraining-container" {
+resource "azurerm_storage_container" "tfstate" {
   name                  = "my-blob-container"
   storage_account_name  = azurerm_storage_account.storage-account-azure-anne-eazytraining.name
   container_access_type = "private"
-  }
+ }
