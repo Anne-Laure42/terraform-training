@@ -12,6 +12,8 @@
 - Ajoutez une variable "locals" avec des tags "environement" et "owner" dans le fichier provider.tf
 
 - Une fois terminé, supprimez vos ressources avec terraform destroy
+  
+- Ne pas oublier de supprimer les fichiers .terraform (ls -la) pour ne pas avoir de message d'erreur lors du prochain "terraform init"
 
 - Créez un dossier **tp-5** comme vous l’avez fait au **tp-4** pour conserver votre code
 
