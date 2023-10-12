@@ -3,13 +3,13 @@
 
 ###  TP-5  - Remote Backend
 
-- Créez un conteneur (blob storage) nommé backend dans une compte de stockage nommé azure-backend-<votre prénom> au sein de votre abonnement.
+- Dans le fichier main.tf, ajouter les ressources pour créez un conteneur (blob storage) dans un compte de stockage.
+  
+- Lancez les commandes "terraform plan" et "terraform apply" avec les fichiers du tp-4. Une fois l'infra déployée, créez un fichier backend.tf et insérez le code nécessaire à la création d'un backend pour le ".tfstate".
 
-- Modifiez votre rendu du **tp-4** afin d’y intégrer le stockage du tfstate sur votre conteneur blob
+- Vérifiez après avoir lancé un déploiement que le fichier ".tfstate" est bien créé dans le "Blob" et contient les infos à jour.
 
-- Vérifiez après avoir lancé un déploiement que le fichier sur le bucket est bien créé et contient bien les infos à jour
-
-- Ajoutez une variable "locals" avec des tags "environement" et "owner" dans le fichier provider.tf
+- BONUS : Ajoutez une variable "locals" avec des tags "environement" et "owner" dans le fichier provider.tf
 
 - Une fois terminé, supprimez vos ressources avec terraform destroy
   
