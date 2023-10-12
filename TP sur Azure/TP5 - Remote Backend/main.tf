@@ -11,6 +11,8 @@ resource "random_string" "storage_account" {
 resource "azurerm_resource_group" "tfeazytraining-gp" {
   name     = var.resource_group_name
   location = var.location
+  
+  tags = local.tags
 }
 
 # Create a Virtual Network
@@ -20,9 +22,7 @@ resource "azurerm_virtual_network" "tfeazytraining-vnet" {
   resource_group_name = azurerm_resource_group.tfeazytraining-gp.name
   address_space       = ["10.0.0.0/16"]
 
-  tags = {
-    environment = "nginx-server"
-  }
+  tags = local.tags
 }
 
 # Create a Subnet in the Virtual Network
@@ -64,9 +64,13 @@ resource "azurerm_network_security_group" "tfeazytraining-nsg" {
        destination_address_prefix = "*"
    }
 
-  tags = {
-    environment = "nginx-server"
-  }
+  tags = local.tags
+}
+
+# Create a Network Interface Security Group association
+resource "azurerm_network_interface_security_group_association" "tfeazytraining-assoc" {
+  network_interface_id      = azurerm_network_interface.tfeazytraining-vnic.id
+  network_security_group_id = azurerm_network_security_group.tfeazytraining-nsg.id
 }
 
 # Create public IPs
@@ -89,9 +93,7 @@ resource "azurerm_network_interface" "tfeazytraining-vnic" {
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.tfeazytraining-pubip.id
   }
-  tags = {
-    environment = "nginx-server"
-  }
+  tags = local.tags
 }
 
 # Create a Network Interface Security Group association
@@ -136,9 +138,7 @@ resource "azurerm_linux_virtual_machine" "tfeazytraining-nginxserver" {
     caching              = "ReadWrite"
   }
 	
-  tags = {
-    environment = "nginx-server"
-  }
+  tags = local.tags
 
   connection {
         host = azurerm_linux_virtual_machine.tfeazytraining-nginxserver.public_ip_address
@@ -171,9 +171,7 @@ resource "azurerm_storage_account" "storage-account-azure-anne-eazytraining" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
 
-  tags = {
-    environment = "nginx-server"
-  }
+  tags = local.tags
 }
 
 # Create a Blob container
