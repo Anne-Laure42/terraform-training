@@ -11,3 +11,11 @@ terraform {
 provider "azurerm" {
   features {}
 }
+
+locals {
+  name = "Test"
+  tags = {
+    environement = "Lab"
+    owner = "Test"
+  }
+}
