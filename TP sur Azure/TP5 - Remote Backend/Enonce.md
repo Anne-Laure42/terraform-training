@@ -3,7 +3,7 @@
 
 ###  TP-5  - Remote Backend
 
-- Dans le fichier main.tf, ajouter les ressources pour créez un conteneur (blob storage) dans un compte de stockage.
+- Dans le fichier main.tf, ajoutez les ressources pour créer un conteneur (blob storage) dans un compte de stockage.
   
 - Lancez les commandes "terraform plan" et "terraform apply" avec les fichiers du tp-4. Une fois l'infra déployée, créez un fichier backend.tf et insérez le code nécessaire à la création d'un backend pour le ".tfstate".
 
