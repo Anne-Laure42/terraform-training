@@ -96,12 +96,6 @@ resource "azurerm_network_interface" "tfeazytraining-vnic" {
   tags = local.tags
 }
 
-# Create a Network Interface Security Group association
-resource "azurerm_network_interface_security_group_association" "tfeazytraining-assoc" {
-  network_interface_id      = azurerm_network_interface.tfeazytraining-vnic.id
-  network_security_group_id = azurerm_network_security_group.tfeazytraining-nsg.id
-}
-
 # Generate SSH key
 resource "tls_private_key" "ssh" {
   algorithm = "RSA"
