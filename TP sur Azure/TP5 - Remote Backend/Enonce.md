@@ -9,9 +9,13 @@
 
 - Vérifiez après avoir lancé un déploiement que le fichier sur le bucket est bien créé et contient bien les infos à jour
 
+- Ajouterz une variable "locals" avec des tags "environement" et "owner" dans le fichier provider.tf
+
 - Une fois terminé, supprimez vos ressources avec terraform destroy
 
 - Créez un dossier **tp-5** comme vous l’avez fait au **tp-4** pour conserver votre code
+
+- 
 
 ### Solution :
 
