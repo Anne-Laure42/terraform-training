@@ -17,7 +17,6 @@
 
 - Créez un dossier **tp-5** comme vous l’avez fait au **tp-4** pour conserver votre code
 
-- 
 
 ### Solution :
 
