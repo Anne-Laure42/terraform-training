@@ -9,7 +9,7 @@
 
 - Vérifiez après avoir lancé un déploiement que le fichier sur le bucket est bien créé et contient bien les infos à jour
 
-- Ajouterz une variable "locals" avec des tags "environement" et "owner" dans le fichier provider.tf
+- Ajoutez une variable "locals" avec des tags "environement" et "owner" dans le fichier provider.tf
 
 - Une fois terminé, supprimez vos ressources avec terraform destroy
 
