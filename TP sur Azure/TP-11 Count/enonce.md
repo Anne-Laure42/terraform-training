@@ -24,5 +24,9 @@ Fichier Main.tf
 
 resource "azurerm_linux_virtual_machine" "example" {
   count               = lenght(var.vm_names)
-  name                = var.vm_names[count.index +1]
+  name                = var.vm_names[count.index]
+
+resource "azurerm_public_ip" "example" {
+  count               = lenght(var.vm_names)
+  name                = "${var.vm_names}${count.index +1}-pubip"
 
