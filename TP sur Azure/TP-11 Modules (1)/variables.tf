@@ -1,19 +1,19 @@
-variable "environment" {
-    type = string
-    description = "environement"
-    default = "test"
-}
+#variable "environment" {
+#    type = string
+#    description = "environement"
+#    default = "test"
+#}
 
 #variable "name" {
 #   description = "(optional) describe your variable"
 #    default = module.azurerm_storage_account.sto.name
 #}
 
-variable "resource_group_name" {
-    type = string
-    description = "Name of the rg"
-    default = "test"
-}
+#variable "resource_group_name" {
+#    type = string
+#    description = "Name of the rg"
+#    default = "test"
+#}
 
 #variable "location" {
 #    type = string
