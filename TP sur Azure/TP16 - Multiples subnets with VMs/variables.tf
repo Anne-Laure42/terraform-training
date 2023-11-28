@@ -33,8 +33,8 @@ variable "project" {
     type = map(string)
     description = "(optional) describe your variable"
     default = {
-        environement = "demo"
-        project_name = "lab"
+        environment = "lab"
+        project_name = "subnets&vms"
     }
 }
 
